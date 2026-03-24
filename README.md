@@ -1,4 +1,7 @@
 # The Geometry of the Thaw
+
+EDIT: Added who is the observer paper. 
+
 **Wave-Particle Duality, Spin, and the Uncertainty Principle Derived from Clockfield Dynamics**
 
 **Author:** Antti Luode — PerceptionLab, Helsinki, Finland  
