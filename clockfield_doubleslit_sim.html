@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NL-TOCT: The Geometry of the Thaw</title>
+    <style>
+        :root {
+            --bg: #0d1117;
+            --panel: #161b22;
+            --border: #30363d;
+            --text: #c9d1d9;
+            --cyan: #58a6ff;
+            --red: #f85149;
+            --green: #238636;
+        }
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            color: var(--cyan);
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+        .subtitle {
+            font-size: 14px;
+            color: #8b949e;
+            max-width: 800px;
+            text-align: center;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        .canvas-wrapper {
+            position: relative;
+            border: 2px solid var(--border);
+            border-radius: 4px;
+            box-shadow: 0 0 30px rgba(88, 166, 255, 0.1);
+            background-color: #000;
+        }
+        canvas {
+            display: block;
+        }
+        .dashboard {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            background: var(--panel);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            width: 760px;
+            justify-content: space-between;
+        }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 30%;
+        }
+        label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            color: #8b949e;
+        }
+        input[type=range] {
+            width: 100%;
+            cursor: pointer;
+        }
+        .val-display {
+            margin-top: 5px;
+            font-family: monospace;
+            font-size: 14px;
+            color: var(--cyan);
+        }
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border);
+            align-items: center;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        #toggleDetector {
+            background-color: var(--border);
+            color: white;
+            border: 1px solid #8b949e;
+            width: 300px;
+        }
+        #toggleDetector.active {
+            background-color: var(--red);
+            border-color: var(--red);
+            box-shadow: 0 0 15px rgba(248, 81, 73, 0.4);
+        }
+        #clearBtn {
+            background-color: transparent;
+            color: #8b949e;
+            border: 1px solid var(--border);
+        }
+        #clearBtn:hover {
+            color: white;
+            border-color: #8b949e;
+        }
+        .explanation {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(88, 166, 255, 0.05);
+            border-left: 4px solid var(--cyan);
+            width: 770px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .exp-title {
+            font-weight: bold;
+            color: var(--cyan);
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>NL-TOCT: The Geometry of the Thaw</h1>
+    <div class="subtitle">
+        Observation is not mystical. It is a physical collision.<br>
+        Watch how the <b>Clockfield Proper-Time Metric (Γ)</b> explains wave-particle duality deterministically.
+    </div>
+
+    <div class="canvas-wrapper">
+        <canvas id="simCanvas" width="800" height="400"></canvas>
+    </div>
+
+    <div class="dashboard">
+        <div class="control-group">
+            <label>Clockfield Coupling (τ)</label>
+            <input type="range" id="tau" min="0.1" max="5.0" step="0.1" value="2.8">
+            <div class="val-display" id="tauVal">2.80</div>
+        </div>
+        <div class="control-group">
+            <label>TADS Noise Sea (σ)</label>
+            <input type="range" id="noise" min="0.0" max="2.0" step="0.1" value="0.8">
+            <div class="val-display" id="noiseVal">0.80</div>
+        </div>
+        <div class="control-group">
+            <label>Freeze Threshold (Ξ)</label>
+            <input type="range" id="threshold" min="0.5" max="3.0" step="0.1" value="1.5">
+            <div class="val-display" id="thresholdVal">1.50</div>
+        </div>
+        
+        <div class="btn-group">
+            <button id="toggleDetector">Which-Path Detector: OFF</button>
+            <button id="clearBtn">Wipe Frozen Record</button>
+            <div class="val-display" style="color: #ff7b72;">Frozen Particles: <span id="countDisplay">0</span></div>
+        </div>
+    </div>
+
+    <div class="explanation" id="expBox">
+        <div class="exp-title">STATE: SUPERPOSITION (THE THAW)</div>
+        The U(1) wave passes through both slits. The continuous geometry of the field allows the two wave fronts to interfere. 
+        Where constructive interference occurs, the squared-amplitude (β) naturally spikes. This local energy peak lowers the proper-time metric (Γ). 
+        When this high-energy wave hits the back screen and mixes with the background noise, it crosses the collapse threshold (Ξ ≥ 1), freezing into a discrete particle. The interference bands are a map of where time is allowed to stop.
+    </div>
+
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Layout Constants
+        const SLIT_X = 150;
+        const SCREEN_X = 700;
+        const SLIT_1_Y = 170;
+        const SLIT_2_Y = 230;
+        
+        // Physics Parameters
+        let tau = 2.8;
+        let noiseLevel = 0.8;
+        let threshold = 1.5;
+        let detectorOn = false;
+        
+        const k = 0.6; // Wavenumber
+        const A_base = 45; // Base amplitude
+
+        // State
+        let particles =[];
+        let fieldImageData = ctx.createImageData(canvas.width, canvas.height);
+        let needsFieldUpdate = true;
+
+        // UI Elements
+        const tauSlider = document.getElementById('tau');
+        const noiseSlider = document.getElementById('noise');
+        const threshSlider = document.getElementById('threshold');
+        const toggleBtn = document.getElementById('toggleDetector');
+        const expBox = document.getElementById('expBox');
+
+        // Event Listeners
+        tauSlider.oninput = (e) => { tau = parseFloat(e.target.value); document.getElementById('tauVal').innerText = tau.toFixed(2); needsFieldUpdate = true; };
+        noiseSlider.oninput = (e) => { noiseLevel = parseFloat(e.target.value); document.getElementById('noiseVal').innerText = noiseLevel.toFixed(2); };
+        threshSlider.oninput = (e) => { threshold = parseFloat(e.target.value); document.getElementById('thresholdVal').innerText = threshold.toFixed(2); };
+
+        document.getElementById('clearBtn').onclick = () => {
+            particles =[];
+            document.getElementById('countDisplay').innerText = "0";
+        };
+
+        toggleBtn.onclick = () => {
+            detectorOn = !detectorOn;
+            needsFieldUpdate = true;
+            particles =[]; // Wipe screen when changing modes
+            document.getElementById('countDisplay').innerText = "0";
+            
+            if (detectorOn) {
+                toggleBtn.innerText = "Which-Path Detector: ON";
+                toggleBtn.classList.add('active');
+                expBox.innerHTML = `<div class="exp-title" style="color: var(--red);">STATE: OBJECTIVE COLLAPSE (THE FREEZE)</div>
+                The detector fires a probe wave at the slits. This is a physical collision. The injected energy forces the local field amplitude (β) to cross the threshold (Ξ ≥ 1) <b>at the slit</b>. 
+                The wave collapses early. The spatial phase coherence (the interference term) is physically destroyed. The field that propagates to the back screen is now just a classical addition of two separate probabilities. 
+                <b>Observation is writing. You forced the field to freeze before it could interfere.</b>`;
+                expBox.style.borderLeftColor = "var(--red)";
+            } else {
+                toggleBtn.innerText = "Which-Path Detector: OFF";
+                toggleBtn.classList.remove('active');
+                expBox.innerHTML = `<div class="exp-title">STATE: SUPERPOSITION (THE THAW)</div>
+                The U(1) wave passes through both slits. The continuous geometry of the field allows the two wave fronts to interfere. 
+                Where constructive interference occurs, the squared-amplitude (β) naturally spikes. This local energy peak lowers the proper-time metric (Γ). 
+                When this high-energy wave hits the back screen and mixes with the background noise, it crosses the collapse threshold (Ξ ≥ 1), freezing into a discrete particle. The interference bands are a map of where time is allowed to stop.`;
+                expBox.style.borderLeftColor = "var(--cyan)";
+            }
+        };
+
+        // Distance formula
+        function dist(x1, y1, x2, y2) {
+            return Math.sqrt((x2 - x1)**2 + (y2 - y1)**2);
+        }
+
+        // Pre-compute the background field (Heavy Math)
+        function computeField() {
+            const data = fieldImageData.data;
+            
+            for (let y = 0; y < canvas.height; y++) {
+                for (let x = 0; x < canvas.width; x++) {
+                    const idx = (y * canvas.width + x) * 4;
+
+                    // Before slits (Incoming plane wave representation)
+                    if (x < SLIT_X) {
+                        // Simple fading wave visualization
+                        const wave = Math.cos(x * 0.1) * (x / SLIT_X);
+                        const intensity = Math.max(0, wave * 100);
+                        data[idx] = 0; data[idx+1] = intensity*0.5; data[idx+2] = intensity; data[idx+3] = 255;
+                        continue;
+                    }
+
+// After slits
+                    const r1 = dist(x, y, SLIT_X, SLIT_1_Y);
+                    const r2 = dist(x, y, SLIT_X, SLIT_2_Y);
+
+                    // NEW: Calculate the angle from the slit to create a directional beam envelope
+                    // This physically represents a finite-width slit (Single-Slit Diffraction Envelope)
+                    const dx = Math.max(x - SLIT_X, 1); 
+                    const angle1 = Math.atan2(y - SLIT_1_Y, dx);
+                    const angle2 = Math.atan2(y - SLIT_2_Y, dx);
+                    
+                    const beamSpread = 0.12; // Controls how "focused" the beam is
+                    const env1 = Math.exp(-(angle1 * angle1) / (2 * beamSpread * beamSpread));
+                    const env2 = Math.exp(-(angle2 * angle2) / (2 * beamSpread * beamSpread));
+
+                    // Apply the directional envelope to the amplitudes
+                    const a1 = (A_base / Math.sqrt(r1 + 1)) * env1;
+                    const a2 = (A_base / Math.sqrt(r2 + 1)) * env2;
+
+                    let beta;
+                    if (detectorOn) {
+                        // DETECTOR ON: Phase coherence destroyed by observation at the slit.
+                        // The interference term 2*a1*a2*cos(dTheta) vanishes.
+                        beta = (a1*a1) + (a2*a2);
+                    } else {
+                        // DETECTOR OFF: Pure U(1) Wave Interference
+                        const phaseDiff = k * (r1 - r2);
+                        beta = (a1*a1) + (a2*a2) + 2 * a1 * a2 * Math.cos(phaseDiff);
+                    }
+
+                    // Clockfield Metric: Gamma
+                    const gamma = 1.0 / Math.pow((1.0 + tau * beta), 2);
+                    
+                    // Visualization: 1 - Gamma (High Beta = Low Gamma = Bright Cyan)
+                    const intensity = (1.0 - gamma) * 255;
+
+                    data[idx] = detectorOn ? intensity * 0.4 : intensity * 0.1; // R (Reddish if observed)
+                    data[idx+1] = detectorOn ? intensity * 0.2 : intensity * 0.6; // G
+                    data[idx+2] = detectorOn ? intensity * 0.2 : intensity;       // B
+                    data[idx+3] = 255; // Alpha
+                }
+            }
+            needsFieldUpdate = false;
+        }
+
+        // Draw the static physical elements
+        function drawHardware() {
+            // Draw Wall
+            ctx.fillStyle = '#30363d';
+            ctx.fillRect(SLIT_X - 5, 0, 10, canvas.height);
+            
+            // Cut Slits
+            ctx.fillStyle = '#000';
+            ctx.fillRect(SLIT_X - 6, SLIT_1_Y - 10, 12, 20);
+            ctx.fillRect(SLIT_X - 6, SLIT_2_Y - 10, 12, 20);
+
+            // Draw Back Screen
+            ctx.fillStyle = '#161b22';
+            ctx.fillRect(SCREEN_X, 0, canvas.width - SCREEN_X, canvas.height);
+            ctx.strokeStyle = '#58a6ff';
+            ctx.beginPath();
+            ctx.moveTo(SCREEN_X, 0);
+            ctx.lineTo(SCREEN_X, canvas.height);
+            ctx.stroke();
+
+            // Draw Detector Eyes (if ON)
+            if (detectorOn) {
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = '#f85149';
+                ctx.fillStyle = '#f85149';
+                ctx.beginPath();
+                ctx.arc(SLIT_X, SLIT_1_Y, 4, 0, Math.PI*2);
+                ctx.arc(SLIT_X, SLIT_2_Y, 4, 0, Math.PI*2);
+                ctx.fill();
+                ctx.shadowBlur = 0; // reset
+            }
+        }
+
+        // The Collapse Mechanics
+        function processParticles() {
+            // We only process particles arriving at the screen
+            // Throttle the spawning rate for visual clarity
+            if (Math.random() > 0.3 && particles.length < 3000) {
+                // Pick a random Y coordinate on the screen
+                const y = Math.random() * canvas.height;
+                
+                const r1 = dist(SCREEN_X, y, SLIT_X, SLIT_1_Y);
+                const r2 = dist(SCREEN_X, y, SLIT_X, SLIT_2_Y);
+                
+                // NEW: Apply the same beam envelope to the particle collapse logic
+                const dx = SCREEN_X - SLIT_X;
+                const angle1 = Math.atan2(y - SLIT_1_Y, dx);
+                const angle2 = Math.atan2(y - SLIT_2_Y, dx);
+                
+                const beamSpread = 0.12; 
+                const env1 = Math.exp(-(angle1 * angle1) / (2 * beamSpread * beamSpread));
+                const env2 = Math.exp(-(angle2 * angle2) / (2 * beamSpread * beamSpread));
+
+                const a1 = (A_base / Math.sqrt(r1 + 1)) * env1;
+                const a2 = (A_base / Math.sqrt(r2 + 1)) * env2;
+
+                let beta;
+                if (detectorOn) {
+                    beta = (a1*a1) + (a2*a2);
+                } else {
+                    const phaseDiff = k * (r1 - r2);
+                    beta = (a1*a1) + (a2*a2) + 2 * a1 * a2 * Math.cos(phaseDiff);
+                }
+
+                // NL-TOCT Rule: Apply Noise Sea and check Threshold
+                const observedBeta = beta + (Math.random() * noiseLevel);
+
+                if (observedBeta > threshold) {
+                    // Particle Freezes. Write it to the array.
+                    // Scatter slightly on X axis to simulate penetration/wall depth
+                    particles.push({
+                        x: SCREEN_X + 2 + Math.random() * 20,
+                        y: y
+                    });
+                    document.getElementById('countDisplay').innerText = particles.length;
+                }
+            }
+
+            // Draw all frozen particles
+            ctx.fillStyle = detectorOn ? '#ff7b72' : '#58a6ff';
+            ctx.globalAlpha = 0.8;
+            for (let p of particles) {
+                ctx.fillRect(p.x, p.y, 2, 2);
+            }
+            ctx.globalAlpha = 1.0;
+        }
+
+        // Main Animation Loop
+        function loop() {
+            if (needsFieldUpdate) {
+                computeField();
+            }
+            
+            // 1. Draw Field
+            ctx.putImageData(fieldImageData, 0, 0);
+            
+            // 2. Draw Walls and Screen
+            drawHardware();
+            
+            // 3. Process the Collapse and Draw Particles
+            processParticles();
+
+            requestAnimationFrame(loop);
+        }
+
+        // Start
+        loop();
+
+    </script>
+</body>
+</html>
