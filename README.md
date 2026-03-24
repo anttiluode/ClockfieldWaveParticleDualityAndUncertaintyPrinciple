@@ -1,6 +1,6 @@
 # The Geometry of the Thaw
 
-EDIT: Added who is the observer paper. 
+EDIT: Added who is the observer paper and Non-Linear, Topologically-Constrained Objective Collapse Theory (NL-TOCT)
 
 **Wave-Particle Duality, Spin, and the Uncertainty Principle Derived from Clockfield Dynamics**
 
