@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NL-TOCT: The Qubit as a Thawed Wave</title>
+    <style>
+        :root {
+            --bg: #090c10;
+            --panel: #161b22;
+            --border: #30363d;
+            --text: #c9d1d9;
+            --cyan: #39c5bb;
+            --red: #ff7b72;
+            --gold: #d2a8ff;
+        }
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            color: var(--cyan);
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+        .subtitle {
+            font-size: 14px;
+            color: #8b949e;
+            max-width: 850px;
+            text-align: center;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        .canvas-wrapper {
+            position: relative;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            box-shadow: 0 0 40px rgba(57, 197, 187, 0.1);
+            background-color: #000;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+        }
+        .labels {
+            position: absolute;
+            top: 10px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 20px;
+            box-sizing: border-box;
+            pointer-events: none;
+            font-family: monospace;
+            color: rgba(255,255,255,0.5);
+            font-size: 12px;
+            letter-spacing: 1px;
+        }
+        .dashboard {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            background: var(--panel);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            width: 760px;
+            justify-content: space-between;
+        }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 22%;
+        }
+        label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            color: #8b949e;
+            text-align: center;
+        }
+        input[type=range] {
+            width: 100%;
+            cursor: pointer;
+            accent-color: var(--cyan);
+        }
+        .val-display {
+            margin-top: 5px;
+            font-family: monospace;
+            font-size: 14px;
+            color: var(--cyan);
+        }
+        .btn-group {
+            display: flex;
+            flex-direction: row;
+            gap: 15px;
+            width: 100%;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border);
+            justify-content: center;
+        }
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        #measureBtn {
+            background-color: var(--cyan);
+            color: #000;
+            box-shadow: 0 0 15px rgba(57, 197, 187, 0.3);
+        }
+        #measureBtn:hover {
+            background-color: #2eb0a6;
+            box-shadow: 0 0 20px rgba(57, 197, 187, 0.6);
+        }
+        #measureBtn:active {
+            transform: scale(0.98);
+        }
+        #clearBtn {
+            background-color: transparent;
+            color: #8b949e;
+            border: 1px solid var(--border);
+        }
+        #clearBtn:hover {
+            color: white;
+            border-color: #8b949e;
+        }
+        .explanation {
+            margin-top: 20px;
+            padding: 15px 20px;
+            background: rgba(255, 123, 114, 0.05);
+            border-left: 4px solid var(--red);
+            width: 760px;
+            box-sizing: border-box;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .exp-title {
+            font-weight: bold;
+            color: var(--red);
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>NL-TOCT: The Qubit is a Thawed Wave</h1>
+    <div class="subtitle">
+        Qubits do not compute in parallel universes. They are continuous fluid waves flooding a geometry. <br>
+        A quantum algorithm tunes the phases so the waves destructively cancel everywhere except the "Correct Answer".<br>
+        <b>Watch the wave self-focus, and test the physical energy limit of Quantum Computers.</b>
+    </div>
+
+    <div class="canvas-wrapper">
+        <div class="labels">
+            <span>[ INITIALIZATION ]</span>
+            <span style="padding-left: 60px;">[ 5-STATE SUPERPOSITION (THE MAZE) ]</span>
+            <span>[ INTERFERENCE & READOUT SCREEN ]</span>
+        </div>
+        <canvas id="simCanvas" width="800" height="400"></canvas>
+    </div>
+
+    <div class="dashboard">
+        <div class="control-group">
+            <label>Qubit Wave Energy (Amplitude)</label>
+            <input type="range" id="energy" min="10" max="50" step="1" value="22">
+            <div class="val-display" id="energyVal">22</div>
+        </div>
+        <div class="control-group">
+            <label>Clockfield Coupling (τ)</label>
+            <input type="range" id="tau" min="0.1" max="4.0" step="0.1" value="1.5">
+            <div class="val-display" id="tauVal">1.50</div>
+        </div>
+        <div class="control-group">
+            <label>TADS Noise Sea (σ)</label>
+            <input type="range" id="noise" min="0.0" max="2.0" step="0.1" value="0.5">
+            <div class="val-display" id="noiseVal">0.50</div>
+        </div>
+        <div class="control-group">
+            <label>Freeze Threshold (Ξ)</label>
+            <input type="range" id="threshold" min="0.5" max="3.0" step="0.1" value="1.8">
+            <div class="val-display" id="thresholdVal">1.80</div>
+        </div>
+        
+        <div class="btn-group">
+            <button id="measureBtn">Force Measurement (Collapse)</button>
+            <button id="clearBtn">Wipe Errors / Scars</button>
+        </div>
+    </div>
+
+    <div class="explanation">
+        <div class="exp-title">THE DECOHERENCE LIMIT (Try This Experiment):</div>
+        Engineers often try to boost signal strength to read qubits better. <b>Increase the "Qubit Wave Energy" slider to 40.</b><br>
+        Notice what happens: The wave's internal energy ($\beta$) becomes so high that the natural vacuum noise pushes it over the $\Xi \ge 1$ threshold <i>inside</i> the quantum chip. The wave violently crystallizes into red particles early, destroying the calculation. <b>This is Decoherence.</b> It is not a hardware bug; it is a fundamental thermodynamic limit enforced by the universe's metric.
+    </div>
+
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Layout Constants
+        const CHANNELS_X_START = 150;
+        const CHANNELS_X_END = 500;
+        const SCREEN_X = 750;
+        
+        // The 5 "States" (Superposition paths)
+        const channels_Y =[80, 140, 200, 260, 320];
+        const TARGET_Y = 200; // The "Correct Answer" we want to amplify
+        
+        // Physics Parameters
+        let A_base = 22;
+        let tau = 1.5;
+        let noiseLevel = 0.5;
+        let threshold = 1.8;
+        
+        const k = 0.4; // Wavenumber
+        let omega = 0; // Time
+        let measureFlash = 0; // Forces collapse when button is clicked
+
+        // Precompute phases for the Quantum Algorithm
+        // We set the phase of each channel so that they perfectly align (constructive interference)
+        // exactly at the TARGET_Y on the readout screen.
+        const phases = channels_Y.map(y => {
+            const distToTarget = Math.sqrt(Math.pow(SCREEN_X - CHANNELS_X_END, 2) + Math.pow(TARGET_Y - y, 2));
+            return -k * distToTarget; // This perfectly compensates the travel distance!
+        });
+
+        // Optimization: Precompute geometric distances and phases for the interference chamber
+        const distMap = new Float32Array(canvas.width * canvas.height * 5);
+        const ampMap = new Float32Array(canvas.width * canvas.height * 5);
+        
+        for (let y = 0; y < canvas.height; y++) {
+            for (let x = CHANNELS_X_END; x < canvas.width; x++) {
+                for (let i = 0; i < 5; i++) {
+                    const idx = (y * canvas.width + x) * 5 + i;
+                    const d = Math.sqrt(Math.pow(x - CHANNELS_X_END, 2) + Math.pow(y - channels_Y[i], 2));
+                    distMap[idx] = k * d + phases[i];
+                    ampMap[idx] = 1.0 / Math.sqrt(d * 0.08 + 1); // geometric spreading
+                }
+            }
+        }
+
+        // State
+        let particles =[];
+        let fieldImageData = ctx.createImageData(canvas.width, canvas.height);
+
+        // UI Elements
+        document.getElementById('energy').oninput = (e) => { A_base = parseFloat(e.target.value); document.getElementById('energyVal').innerText = A_base; };
+        document.getElementById('tau').oninput = (e) => { tau = parseFloat(e.target.value); document.getElementById('tauVal').innerText = tau.toFixed(2); };
+        document.getElementById('noise').oninput = (e) => { noiseLevel = parseFloat(e.target.value); document.getElementById('noiseVal').innerText = noiseLevel.toFixed(2); };
+        document.getElementById('threshold').oninput = (e) => { threshold = parseFloat(e.target.value); document.getElementById('thresholdVal').innerText = threshold.toFixed(2); };
+
+        document.getElementById('clearBtn').onclick = () => { particles =[]; };
+        
+        document.getElementById('measureBtn').onclick = () => { 
+            measureFlash = 5; // Boosts beta at the screen for 5 frames to force crystallization
+        };
+
+        // Draw the static physical elements
+        function drawHardware() {
+            ctx.fillStyle = '#161b22';
+            // Waveguides
+            for (let y of channels_Y) {
+                ctx.fillRect(CHANNELS_X_START, y - 15, CHANNELS_X_END - CHANNELS_X_START, 30);
+            }
+            // Screen
+            ctx.fillStyle = '#30363d';
+            ctx.fillRect(SCREEN_X, 0, 50, canvas.height);
+            ctx.strokeStyle = '#39c5bb';
+            ctx.beginPath();
+            ctx.moveTo(SCREEN_X, 0);
+            ctx.lineTo(SCREEN_X, canvas.height);
+            ctx.stroke();
+
+            // Target Highlight
+            ctx.fillStyle = 'rgba(210, 168, 255, 0.1)';
+            ctx.fillRect(SCREEN_X, TARGET_Y - 20, 50, 40);
+            ctx.strokeStyle = '#d2a8ff';
+            ctx.strokeRect(SCREEN_X, TARGET_Y - 20, 50, 40);
+        }
+
+        function computeAndRender() {
+            const data = fieldImageData.data;
+            
+            for (let y = 0; y < canvas.height; y++) {
+                for (let x = 0; x < canvas.width; x++) {
+                    const pixelIdx = (y * canvas.width + x) * 4;
+                    let beta = 0;
+
+                    // 1. INPUT ZONE (Initial Superposition split)
+                    if (x < CHANNELS_X_START) {
+                        let sum = 0;
+                        for (let i = 0; i < 5; i++) {
+                            const d = Math.sqrt(Math.pow(x - CHANNELS_X_START, 2) + Math.pow(y - channels_Y[i], 2));
+                            const a = A_base / Math.sqrt(d * 0.1 + 1);
+                            sum += a * Math.cos(k * d - omega);
+                        }
+                        beta = sum * sum;
+                    } 
+                    // 2. THE QUANTUM MAZE (Waveguides)
+                    else if (x >= CHANNELS_X_START && x < CHANNELS_X_END) {
+                        let inChannel = false;
+                        for (let i = 0; i < 5; i++) {
+                            if (Math.abs(y - channels_Y[i]) < 14) {
+                                // The wave travels down the channel. Phase is modified by the "Algorithm".
+                                const val = A_base * Math.cos(k * x - omega + phases[i]);
+                                beta = val * val;
+                                inChannel = true;
+                                break;
+                            }
+                        }
+                        if (!inChannel) beta = 0;
+                    } 
+                    // 3. THE INTERFERENCE CHAMBER (Readout)
+                    else {
+                        let sum = 0;
+                        for (let i = 0; i < 5; i++) {
+                            const mapIdx = (y * canvas.width + x) * 5 + i;
+                            sum += (A_base * ampMap[mapIdx]) * Math.cos(distMap[mapIdx] - omega);
+                        }
+                        beta = sum * sum;
+
+                        // Force measurement flash
+                        if (measureFlash > 0 && x >= SCREEN_X && x < SCREEN_X + 10) {
+                            beta += 2.0; // Massive energy injection from the "Observer's Probe Wave"
+                        }
+                    }
+
+                    // Clockfield Metric: Gamma
+                    // Prevent crazy blowups if energy is extremely high
+                    const safeBeta = Math.min(beta / 100, 10); 
+                    const gamma = 1.0 / Math.pow((1.0 + tau * safeBeta), 2);
+                    
+                    // Visualization: 1 - Gamma (Time Dilation)
+                    const intensity = (1.0 - gamma) * 255;
+
+                    data[pixelIdx] = intensity * 0.1;     // R
+                    data[pixelIdx+1] = intensity * 0.8;   // G (Cyanish)
+                    data[pixelIdx+2] = intensity;         // B
+                    data[pixelIdx+3] = 255;               // Alpha
+
+                    // --- THE DECOHERENCE LIMIT (The Freeze) ---
+                    // We only check for crystallization inside the chips or at the screen
+                    if (x > CHANNELS_X_START && Math.random() > 0.8 && particles.length < 4000) {
+                        const localNoise = (Math.random() * noiseLevel);
+                        const observedState = safeBeta + localNoise;
+
+                        if (observedState > threshold) {
+                            particles.push({x: x, y: y});
+                        }
+                    }
+                }
+            }
+            
+            // Draw field
+            ctx.putImageData(fieldImageData, 0, 0);
+            
+            // Draw hardware outlines
+            drawHardware();
+
+            // Draw frozen topological scars (Particles)
+            ctx.fillStyle = '#ff7b72';
+            for (let p of particles) {
+                ctx.fillRect(p.x, p.y, 2, 2);
+            }
+
+            // Time evolution
+            omega -= 0.15;
+            if (measureFlash > 0) measureFlash--;
+
+            requestAnimationFrame(computeAndRender);
+        }
+
+        // Start
+        computeAndRender();
+
+    </script>
+</body>
+</html>
