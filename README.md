@@ -1,6 +1,7 @@
 # The Geometry of the Thaw
 
 EDIT: Added who is the observer paper and Non-Linear, Topologically-Constrained Objective Collapse Theory (NL-TOCT)
+also the html double slit sim and the explanation about the results from gemini 3.1
 
 **Wave-Particle Duality, Spin, and the Uncertainty Principle Derived from Clockfield Dynamics**
 
